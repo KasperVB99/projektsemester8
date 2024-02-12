@@ -1,4 +1,5 @@
 library(magrittr)
+library(PortfolioAnalytics)
 R.utils::sourceDirectory("./functions", modifiedOnly = FALSE)
 
 
@@ -11,3 +12,4 @@ list(
     )
   )
 )
+
