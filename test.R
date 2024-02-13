@@ -4,9 +4,9 @@ nordnet_etf = get_data("nordnet_etf")
 
 symbols = nordnet_etf$Ticker
 
-symbols[47:158]
+symbols[60:158]
 
-symbols_manglende = nordnet_etf$Ticker[33:158]
+symbols_manglende = nordnet_etf$Ticker[60:158]
 
 all_etf = tidyquant::tq_get(symbols_manglende, get = "alphavantager",
                                        av_fun = "TIME_SERIES_DAILY",
@@ -17,6 +17,7 @@ all_etf = tidyquant::tq_get(symbols_manglende, get = "alphavantager",
 
 den_her = all_etf %>% 
   dplyr::mutate(timestamp = format(as.POSIXct(timestamp)))
+
 
 conn = DBI::dbConnect(RSQLite::SQLite(), "data/raw_data.sqlite")
 
