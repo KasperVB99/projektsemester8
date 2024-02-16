@@ -1,0 +1,9 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+.storage|object|cdf1abb08a862d91|||||||||||||||
+data_loading|function|9850728b788726cb|||||||||||||||
+date_end|object|b3fccb751d6ef99f|||||||||||||||
+date_start|object|019730e2b000169e|||||||||||||||
+get_data|function|9e84a1ad5abbd30d|||||||||||||||
+get_tables|function|d3c704881446ecb1|||||||||||||||
+portfolio_optimization|function|a32c2179398ec312|||||||||||||||
+raw_data|stem|4e3801235ee266ad|4f80f56580a708f1|0c40bd507fe3a76e|-725646845||t19764.8079333629s|fa14067a76f46a7e|543543|rds|local|vector|||0.78||
