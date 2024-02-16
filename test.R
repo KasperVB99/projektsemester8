@@ -1,22 +1,16 @@
 library(magrittr)
 
-nordnet_etf = get_data("nordnet_etf")
+nordnet_etf = get_data("nordnet_etf") %>% 
+  dplyr::select(symbol = Ticker) %>% 
+  dplyr::anti_join(raw_data) %>% 
+  dplyr::distinct(symbol)
 
-<<<<<<< HEAD
-  
-DBI::dbConnect(
-  RSQLite::SQLite(),
-  "data/raw_data.sqlite",
-  extended_types = TRUE
-)
-=======
-symbols = nordnet_etf$Ticker
 
-symbols[60:158]
 
-symbols_manglende = nordnet_etf$Ticker[60:158]
+symbols = nordnet_etf$symbol
 
-all_etf = tidyquant::tq_get(symbols_manglende, get = "alphavantager",
+
+all_etf = tidyquant::tq_get(symbols, get = "alphavantager",
                                        av_fun = "TIME_SERIES_DAILY",
                                        outputsize = "full",
                                        show_col_types = FALSE,
