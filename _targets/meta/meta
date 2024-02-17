@@ -6,4 +6,4 @@ date_start|object|019730e2b000169e|||||||||||||||
 get_data|function|9e84a1ad5abbd30d|||||||||||||||
 get_tables|function|d3c704881446ecb1|||||||||||||||
 portfolio_optimization|function|a32c2179398ec312|||||||||||||||
-raw_data|stem|3c31cab5db4e3064|4f80f56580a708f1|0c40bd507fe3a76e|-979620141||t19769.4671864284s|6bc750fcd988d396|5212650|feather|local|vector|||1.36||
+raw_data|stem|7d095b1a040b3ac5|4f80f56580a708f1|0c40bd507fe3a76e|-979620141||t19770.415223133s|513e15baa4128af6|3248760|rds|local|vector|||0.74||
