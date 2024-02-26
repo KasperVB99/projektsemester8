@@ -20,6 +20,7 @@ data_loading = function(date_start, date_end){
     dplyr::filter(symbol %in% symbols$symbol &
                   !symbol %in% c("IUSA.DE", "DBXW.DE", "EUNL.DE", "IUSQ.DE", "EQQQ.DE", "LYMS.DE", "IQQQ.DE",
                               "XDUK.DE", "XDJP.DE", "DBXD.DE", "EUN0.DE", "XDN0.DE", "LYM9.DE"))
+  
   data_list = list(raw_data = raw_data,
                    cleaned_raw_data = cleaned_raw_data)
   

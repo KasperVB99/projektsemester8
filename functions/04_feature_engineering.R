@@ -1,6 +1,5 @@
-feature_engineering = function(optimized_portfolio_weights){
-  cleaned_raw_data = raw_data$cleaned_raw_data
-  
+feature_engineering = function(cleaned_raw_data, optimized_portfolio_weights){
+
   features = cleaned_raw_data %>% 
     dplyr::filter(timestamp >= "2014-01-08") %>% 
     dplyr::group_by(year = lubridate::year(timestamp), month = lubridate::month(timestamp), symbol) %>%
@@ -25,7 +24,9 @@ feature_engineering = function(optimized_portfolio_weights){
                                                                 .after = -months(1),
                                                                 complete = TRUE)) %>% 
     dplyr::select(-close) %>% 
-    tidyr::pivot_wider(names_from = "symbol", values_from = c(monthly_returns, rolling_sum_1_quart, rolling_sum_half_year))
+    tidyr::pivot_wider(names_from = "symbol", values_from = c(monthly_returns, rolling_sum_1_quart, rolling_sum_half_year)) %>% 
+    dplyr::full_join(optimized_portfolio_weights) %>% 
+    tidyr::drop_na()
   
     return(features)
 }

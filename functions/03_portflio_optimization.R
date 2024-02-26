@@ -26,7 +26,7 @@ portfolio_optimization = function(cleaned_raw_data){
     dplyr::group_by(invest_day) %>% 
     dplyr::slice(1) %>% 
     dplyr::summarise(month = lubridate::floor_date(timestamp, unit = "months")) %>% 
-    dplyr::select(month) %>% 
+    dplyr::select(timestamp = month) %>% 
     dplyr::ungroup()
   
   result_list = list()
@@ -54,6 +54,5 @@ portfolio_optimization = function(cleaned_raw_data){
     dplyr::bind_cols(purrr::reduce(result_list, dplyr::bind_rows)) %>% 
     dplyr::mutate_if(is.numeric, ~ round(., 2))
     
-  
   return(results)
 }
