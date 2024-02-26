@@ -1,9 +1,11 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.storage|object|908eb0ff2397ebe4|||||||||||||||
-data_loading|function|9850728b788726cb|||||||||||||||
+.storage|object|cdf1abb08a862d91|||||||||||||||
+data_loading|function|2634e530e311746c|||||||||||||||
 date_end|object|b3fccb751d6ef99f|||||||||||||||
 date_start|object|019730e2b000169e|||||||||||||||
 get_data|function|9e84a1ad5abbd30d|||||||||||||||
 get_tables|function|d3c704881446ecb1|||||||||||||||
-portfolio_optimization|function|a32c2179398ec312|||||||||||||||
-raw_data|stem|7d095b1a040b3ac5|4f80f56580a708f1|0c40bd507fe3a76e|-979620141||t19770.415223133s|513e15baa4128af6|3248760|rds|local|vector|||0.74||
+no_cores|object|716961d6a94391e4|||||||||||||||
+optimized_portfolio_weights|stem|508bf09f062a2e01|4b87eddeddf6d30d|d909b55625242e72|-372710646||t19776.5265163566s|4c74d20932e7227f|1803|rds|local|vector|||10.5||
+portfolio_optimization|function|f25ff697e4e30248|||||||||||||||
+raw_data|stem|3dbb251478950732|4f80f56580a708f1|e6310c814784309f|-725646845||t19776.5287834553s|08ad5bb30f1e6085|4569438|rds|local|vector|||2||

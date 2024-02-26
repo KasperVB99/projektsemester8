@@ -1,14 +1,24 @@
 library(magrittr)
 
-nordnet_etf = get_data("nordnet_etf") %>% 
-  dplyr::select(symbol = Ticker) %>% 
-  dplyr::anti_join(raw_data) %>% 
+symbols = get_data("nordnet_etf") %>% 
+  dplyr::rename(symbol = Ticker) %>% 
+  dplyr::full_join(raw_data) %>% 
+  dplyr::arrange(timestamp) %>% 
+  dplyr::group_by(symbol) %>% 
+  dplyr::filter(`Antal ejere` >= 1000,
+                min(timestamp) < "2014-01-01") %>% 
   dplyr::distinct(symbol)
 
+hej = raw_data %>% 
+  dplyr::filter(symbol == "EUNW.DE")
 
 
-symbols = nordnet_etf$symbol
+  ggplot2::ggplot(hej, ggplot2::aes(x = lubridate::as_datetime(timestamp), y = close, group = symbol)) +
+  ggplot2::geom_line()
 
+hej = nordnet_etf$symbol
+
+hej = get_data("nordnet_etf")
 
 all_etf = tidyquant::tq_get(symbols, get = "alphavantager",
                                        av_fun = "TIME_SERIES_DAILY",
@@ -19,7 +29,6 @@ all_etf = tidyquant::tq_get(symbols, get = "alphavantager",
 
 den_her = all_etf %>% 
   dplyr::mutate(timestamp = format(as.POSIXct(timestamp)))
-
 
 conn = DBI::dbConnect(RSQLite::SQLite(), "data/raw_data.sqlite")
 
@@ -32,10 +41,9 @@ hola = get_data("raw_etf_data") %>%
   dplyr::arrange(timestamp) %>% 
   dplyr::select(timestamp, close, symbol) %>% 
   dplyr::group_by(symbol) %>% 
-  dplyr::distinct(timestamp, .keep_all = TRUE) %>% 
   dplyr::mutate(close = log(close/ dplyr::lag(close))) %>% 
-  tidyr::pivot_wider(names_from = symbol, values_from = close) %>% 
-  tidyr::drop_na()
+  dplyr::summarise(returns = sum(close, na.rm = TRUE)) %>% 
+  dplyr::arrange(desc(returns))
 
 
 hejsa = get_data("raw_etf_data") %>% 
