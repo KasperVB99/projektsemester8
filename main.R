@@ -18,10 +18,12 @@ hej = broom::tidy(linear_reg_fitted_and_predicted$fit$fit$fit) %>%
   dplyr::mutate(p.value = round(p.value, 3))
 
 
-library(ompr)
-library(ompr.roi)
-library(ROI)
-library(ROI.plugin.glpk)
+resamples = rsample::sliding_period(training, 
+                                    index = timestamp, 
+                                    period = "month", 
+                                    lookback = 24, 
+                                    assess_stop = 4, 
+                                    step = 12)
 
-if (!requireNamespace("CVXR", quietly = TRUE))
-  install.packages("CVXR")
+
+hej = combinatorial_purged_cv(training)

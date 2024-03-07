@@ -11,7 +11,8 @@ data_loading = function(date_start, date_end){
     dplyr::arrange(timestamp) %>% 
     dplyr::group_by(symbol) %>% 
     dplyr::filter(`Antal ejere` >= 1000,
-                  min(timestamp) < "2014-01-01") %>% 
+                  min(timestamp) < "2014-01-01",
+                  Udbyttepolitik == "Akkumulerende") %>% 
     dplyr::distinct(symbol)
   
   # Medtager kun de ETF'er, som har mindst 1000 ejere og data siden mindst 1. januar 2014. Derudover må ingen ETF'er have korrelation på over
