@@ -1,13 +1,19 @@
 data_preprocessing = function(optimized_portfolio_weights, split_data){
-  outcome_variables = colnames(optimized_portfolio_weights)[-1]
   
-  linear_reg_recipe = recipes::recipe(~ ., split_data$training) %>% 
-    recipes::update_role(tidyselect::all_of(outcome_variables), new_role = "outcome") %>% 
-    recipes::step_date(timestamp, 
-                       features = c("dow", "month"),
-                       keep_original_cols = FALSE) %>%
-    recipes::step_dummy(recipes::all_nominal_predictors()) %>%
-    recipes::step_normalize(recipes::all_predictors())
+  lin_reg_recipe = recipes::recipe(weight ~., split_data$training) %>% 
+    recipes::step_date(
+      timestamp,
+      features = c("month"),
+      keep_original_cols = FALSE
+    ) %>% 
+    recipes::step_dummy(
+      recipes::all_nominal_predictors()
+      ) %>% 
+    recipes::step_normalize(
+      recipes::all_numeric_predictors(), - dplyr::contains(c("symbol", "timestamp"))
+      )
   
-  recipes = list(linear_reg_recipe = linear_reg_recipe)
+  recipes = list(lin_reg_recipe = lin_reg_recipe)
+  
+  return(recipes)
 }

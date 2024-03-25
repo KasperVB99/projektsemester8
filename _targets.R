@@ -1,6 +1,8 @@
-library(magrittr)
-library(PortfolioAnalytics)
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(PortfolioAnalytics))
 R.utils::sourceDirectory("./functions", modifiedOnly = FALSE)
+no_cores <- parallel::detectCores() # Save one core for system processes
+doParallel::registerDoParallel(no_cores)
 
 
 list(
@@ -43,18 +45,26 @@ list(
      )
    ),
   targets::tar_target(
-    defined_workflows,
+    defined_workflow,
     define_workflows(
       preprocessed_data = preprocessed_data,
       specified_models = specified_models
     )
   ),
+  # targets::tar_target(
+  #   linear_reg_tuned_model,
+  #   model_tuning(
+  #     split_data = split_data,
+  #     raw_data = raw_data,
+  #     defined_workflow = defined_workflow$linear_reg_workflow,
+  #     model = "lin_reg"
+  #   )
+  # ),
   targets::tar_target(
     linear_reg_fitted_and_predicted,
     fit_and_predict(
-      defined_workflows = defined_workflows,
-      split_data = split_data,
-      model = "linear_reg"
+      defined_workflow = defined_workflow,
+      split_data = split_data
     )
   )
 )

@@ -1,4 +1,12 @@
-run_strategy = function(fitted_and_predicted, split_data, period = "oos"){
+run_strategy = function(fitted_and_predicted, split_data, raw_data, period = "is", allow_selling = TRUE){
+  
+  if (period == "is"){
+    dates = split_data$training %>% 
+      dplyr::select(timestamp)
+  } else if (period == "oos") {
+    dates = split_data$testing %>% 
+      dplyr::select(timestamp)
+  } else stop("Period has to be either \"is\" for in-sample or \"oos\" for out-of-sample. Use \"is\" for cross-validation")
   
   market_prices = raw_data$cleaned_raw_data %>% 
     dplyr::filter(timestamp >= "2014-01-07") %>% 
@@ -16,27 +24,13 @@ run_strategy = function(fitted_and_predicted, split_data, period = "oos"){
                   timestamp = lubridate::floor_date(timestamp, unit = "months")) %>% 
     dplyr::filter(invest_day == 1) %>% 
     dplyr::ungroup() %>% 
+    dplyr::mutate(market_price = dplyr::if_else(is.na(market_price) == TRUE, buy_price, market_price)) %>% 
     dplyr::select(symbol, timestamp, market_price, buy_price)
 
+  fitted_and_predicted = fitted_and_predicted
   
-  is_dates = split_data$training %>% 
-    dplyr::select(timestamp)
-  
-  oos_dates = split_data$testing
-  
-  fitted_and_predicted = linear_reg_fitted_and_predicted
-  
-  is_predicted = fitted_and_predicted$is_predict %>% 
-    dplyr::bind_cols(is_dates) %>% 
-    dplyr::select(timestamp, dplyr::starts_with(".pred"))
-    
-  oos_predicted = fitted_and_predicted$oos_predict %>% 
-    dplyr::bind_cols(oos_dates) %>% 
-    dplyr::select(timestamp, dplyr::starts_with(".pred"))
-  
-  suggested_weights = oos_predicted %>% 
-    tidyr::pivot_longer(cols = -timestamp, names_to = "symbol", values_to = "target_weight") %>% 
-    dplyr::mutate(symbol = gsub("^\\.pred_", "", symbol)) %>% 
+  suggested_weights = fitted_and_predicted %>% 
+    dplyr::rename(target_weight = .pred) %>% 
     dplyr::inner_join(market_prices) %>% 
     dplyr::group_by(timestamp) %>% 
     dplyr::mutate(target_weight = pmax(0, target_weight),
@@ -47,8 +41,8 @@ run_strategy = function(fitted_and_predicted, split_data, period = "oos"){
   previous_result = list(NULL)
   
   for (i in 1:length(suggested_weights)){
-    
-    final_portfolio_list[[i]] = reallocate_portfolio(suggested_weights[[i]], previous_result[[i]])
+    final_portfolio_list[[i]] = reallocate_portfolio(suggested_weights[[i]], previous_result[[i]],
+                                                     allow_selling = allow_selling)
     previous_result[[(i+1)]] = final_portfolio_list[[i]]
   }
   

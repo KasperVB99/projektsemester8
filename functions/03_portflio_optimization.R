@@ -34,8 +34,8 @@ portfolio_optimization = function(cleaned_raw_data){
   # Rullende portefølheoptimering. Udføres ikke på de to sidste rækker af returns metricen, da disse ikke har et helt kvartals data.
   result_list <- foreach(i = 1:(dplyr::n_distinct(returns_grouped$invest_day) - 2), .packages = c("magrittr", "PortfolioAnalytics")) %dopar% {
     returns <- returns_grouped %>%
-      dplyr::filter(invest_day >= i, 
-                    invest_day < i + 3) %>%
+      dplyr::filter(invest_day >= i,
+                    invest_day < i+3) %>%
       dplyr::select(-invest_day) %>%
       xts::as.xts()
     
@@ -44,7 +44,7 @@ portfolio_optimization = function(cleaned_raw_data){
       PortfolioAnalytics::add.constraint(type = "long_only") %>% 
       PortfolioAnalytics::add.objective(type = "return", name = "mean") %>% 
       PortfolioAnalytics::add.objective(type = "risk", name = "StdDev")
-    
+
     optimize.portfolio(R = returns, portfolio = port_spec, optimize_method = "ROI", maxSR = TRUE)$weights
   }
 
@@ -53,6 +53,5 @@ portfolio_optimization = function(cleaned_raw_data){
     dplyr::slice(1:length(result_list)) %>% 
     dplyr::bind_cols(purrr::reduce(result_list, dplyr::bind_rows)) %>% 
     dplyr::mutate_if(is.numeric, ~ round(., 2))
-    
   return(results)
 }

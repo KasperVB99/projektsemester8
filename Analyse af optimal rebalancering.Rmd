@@ -1,0 +1,17 @@
+---
+title: "Analyse af optimal rebalancering"
+author: "Kasper V. Bargisen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+fitted_and_predicted = optimized_portfolio_weights %>% 
+  tidyr::pivot_longer(-timestamp, names_to = "symbol", values_to = ".pred") %>% 
+  dplyr::select(.pred, symbol, timestamp) %>% 
+  dplyr::semi_join(split_data$training)
+strtegy_perfect_weights = run_strategy(fitted_and_predicted, split_data, raw_data, period = "is", allow_selling = TRUE)
+perfect_weights_pnl = calculate_PnL(strtegy_perfect_weights)
+perfect_weights_pnl
+```
+
