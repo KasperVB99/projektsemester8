@@ -50,7 +50,7 @@ list(
       preprocessed_data = preprocessed_data,
       specified_models = specified_models
     )
-  ),
+  )
   # targets::tar_target(
   #   linear_reg_tuned_model,
   #   model_tuning(
@@ -60,12 +60,12 @@ list(
   #     model = "lin_reg"
   #   )
   # ),
-  targets::tar_target(
-    linear_reg_fitted_and_predicted,
-    fit_and_predict(
-      defined_workflow = defined_workflow,
-      split_data = split_data
-    )
-  )
+  # targets::tar_target(
+  #   linear_reg_fitted_and_predicted,
+  #   fit_and_predict(
+  #     defined_workflow = defined_workflow,
+  #     split_data = split_data
+  #   )
+  # )
 )
 

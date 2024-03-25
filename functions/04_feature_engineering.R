@@ -6,7 +6,7 @@ feature_engineering = function(cleaned_raw_data, optimized_portfolio_weights){
     tidyr::pivot_longer(-timestamp, names_to = "symbol", values_to = "weight")
     
   features = cleaned_raw_data %>% 
-    dplyr::filter(timestamp >= "2013-06-01") %>% 
+    dplyr::filter(timestamp >= "2014-06-01") %>% 
     dplyr::group_by(year = lubridate::year(timestamp), month = lubridate::month(timestamp), symbol) %>%
     dplyr::mutate(eighth_or_next = as.integer((lubridate::day(timestamp) >= 8 & dplyr::row_number() >= 1)),
                   invest_day = dplyr::if_else(eighth_or_next == 1 & cumsum(eighth_or_next) == 1, 1, 0),

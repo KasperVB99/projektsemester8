@@ -11,7 +11,7 @@ portfolio_optimization = function(cleaned_raw_data){
   
   # Sørger for, at returns er grupperet sammen på den korrekte måde, dvs. at der bliver investeret d. 8. eller første hverdag herefter.
   returns_grouped = return_matrix %>% 
-    dplyr::filter(timestamp >= "2014-01-08") %>% 
+    dplyr::filter(timestamp >= "2015-01-08") %>% 
     tidyr::drop_na() %>%   # der skal laves en mere elegant løsning end dette på et tidspunkt
     dplyr::group_by(year = lubridate::year(timestamp), month = lubridate::month(timestamp)) %>%
     dplyr::mutate(eighth_or_next = as.integer((lubridate::day(timestamp) >= 8 & dplyr::row_number() >= 1)),
@@ -32,14 +32,14 @@ portfolio_optimization = function(cleaned_raw_data){
   result_list = list()
   
   # Rullende portefølheoptimering. Udføres ikke på de to sidste rækker af returns metricen, da disse ikke har et helt kvartals data.
-  result_list <- foreach(i = 1:(dplyr::n_distinct(returns_grouped$invest_day) - 2), .packages = c("magrittr", "PortfolioAnalytics")) %dopar% {
-    returns <- returns_grouped %>%
+  result_list = foreach(i = 1:(dplyr::n_distinct(returns_grouped$invest_day) - 2), .packages = c("magrittr", "PortfolioAnalytics")) %dopar% {
+    returns = returns_grouped %>%
       dplyr::filter(invest_day >= i,
                     invest_day < i+3) %>%
       dplyr::select(-invest_day) %>%
       xts::as.xts()
     
-    port_spec <- PortfolioAnalytics::portfolio.spec(assets = colnames(returns)) %>% 
+    port_spec = PortfolioAnalytics::portfolio.spec(assets = colnames(returns)) %>% 
       PortfolioAnalytics::add.constraint(type = "full_investment") %>% 
       PortfolioAnalytics::add.constraint(type = "long_only") %>% 
       PortfolioAnalytics::add.objective(type = "return", name = "mean") %>% 

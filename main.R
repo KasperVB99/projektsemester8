@@ -13,7 +13,7 @@ targets::tar_load_globals()
 
 #-------------------------------------------------------------------------------
 
-hej = preprocessed_data$lin_reg_recipe %>% 
+hej = lin_reg_recipe %>% 
   recipes::prep() %>% 
   recipes::bake(new_data = NULL)
 
@@ -37,7 +37,9 @@ theta = rep(1, 3)
 
 optimal_theta = find_optimal_theta(theta, split_data$training, allow_short_selling = FALSE)
 
-weights = compute_simple_portfolio_weights(optimal_theta$par, split_data$training)
+weights = compute_simple_portfolio_weights(optimal_theta$par, split_data$training) %>% 
+  dplyr::select(.pred = weights, symbol, timestamp) %>% 
+  run_strategy(., split_data, raw_data, period = "is")
 
 weights %>% 
   dplyr::select(timestamp, symbol, weights, excees_returns) %>% 
@@ -48,9 +50,7 @@ weights %>%
                    utility = mean((1 + portfolio_returns)^(1 - 5) / (1 - 5)),
                    pnl = sum(portfolio_returns))
 
-
 optimal_theta$convergence
-
 
 pnl_calculation = weights %>% 
   dplyr::select(timestamp, symbol, weights, excees_returns) %>% 
@@ -81,3 +81,4 @@ metrics = pnl_calculation %>%
                    sharpe = (mean(portfolio_returns) * 12) / sd(portfolio_returns) / sqrt(12),
                    info_ratio = (mean(excess) * 12) / sd(excess) / sqrt(12),
                    mean_return = mean(portfolio_returns))
+

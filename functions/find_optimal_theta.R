@@ -16,7 +16,7 @@ find_optimal_theta = function(theta,
       dplyr::summarise(sharpe = mean(portfolio_returns, na.rm = TRUE) / sd(portfolio_returns, na.rm = TRUE),
                        utility = mean((1 + portfolio_returns)^(1 - 5) / (1 - 5)),
                        pnl = sum(portfolio_returns)) %>% 
-      dplyr::pull(pnl)
+      dplyr::pull(sharpe)
     
     return(-sharpe)
   }

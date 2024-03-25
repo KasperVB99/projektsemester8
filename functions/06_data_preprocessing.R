@@ -1,11 +1,7 @@
 data_preprocessing = function(optimized_portfolio_weights, split_data){
   
   lin_reg_recipe = recipes::recipe(weight ~., split_data$training) %>% 
-    recipes::step_date(
-      timestamp,
-      features = c("month"),
-      keep_original_cols = FALSE
-    ) %>% 
+    recipes::step_select(-symbol, -timestamp, -rf_rate, -monthly_returns) %>% 
     recipes::step_dummy(
       recipes::all_nominal_predictors()
       ) %>% 

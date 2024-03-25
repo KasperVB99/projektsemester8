@@ -5,13 +5,11 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
   exchange_fee = 0.0025
   total_transaction_fee = transaction_fee + exchange_fee
   
-  suggested_weights = suggested_weights[[1]]
-  
   # Definerer vores budget alt efter om vi er i første periode eller ej:
   if(is.null(previous_result)){
-    budget = 10000
+    budget = 1000 - 50
   } else{
-    budget = 10000 + previous_result$money_leftover[1]
+    budget = 1000 - 50 + previous_result$money_leftover[1]
   }
   
   # Definerer de priser vi kender inden køb, de priser vi køber til og vores målvægte til hvert aktiv.
@@ -21,6 +19,7 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
   
   # Definerer den variabel, jeg gerne vil kende størrelsen på (hvor meget der skal købes/sælges af hvert aktiv):
   x = CVXR::Variable(length(target_allocation_weights), integer=TRUE)
+  binary_x = CVXR::Variable(length(target_allocation_weights), boolean=TRUE)
   
   # Definerer mine nuværende positioner, som er 0, hvis det er første periode.
   if(is.null(previous_result) == TRUE){
@@ -30,9 +29,12 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
   }
   
   # Definerer vægten af hvert aktiv, den totale værdi af porteføljen, og de faktiske vægte:
-  asset_class_values = x * buy_prices + current_positions * market_prices
+  asset_class_values = x * market_prices + current_positions * market_prices
   total_value = sum(current_positions * market_prices) + budget
   actual_allocation_weights = asset_class_values / total_value
+  
+  # Finder antallet af lange positioner:
+  n_long = sum(CVXR::pos(x) / CVXR::pos(x))
   
   # Definerer portfolio drift som den variabel, jeg gerne vil minimere størrelsen af:
   portfolio_drift = sum(abs(actual_allocation_weights - target_allocation_weights)) / 2
@@ -42,9 +44,9 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
   
   # Udregner mine totale omkostninger ved at omlægge porteføljen
   sell_amounts = CVXR::pos(-x)
-  sell_values = sell_amounts * buy_prices # Ganger med -1 for at få positive værdier.
-  total_transaction_costs = sell_values * total_transaction_fee
-  total_cost = sum(x * buy_prices)
+  sell_values = sell_amounts * market_prices
+  total_transaction_costs = sum(sell_values * total_transaction_fee)
+  total_cost = sum(x * market_prices)
   
   
   # Definerer mine constrains; omkostninger mindre end budget, og money left over skal være mindre end den billigste ETF.
@@ -54,7 +56,7 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
                        (budget - total_cost) <= min(market_prices) - 1e-2)
   } else if (allow_selling == TRUE){
     constraints = list((x + current_positions) >= 0,
-                       (budget - total_cost - total_transaction_costs) >= 0,
+                       (total_cost + total_transaction_costs) <= budget - 1e-2,
                        (budget - total_cost) <= min(market_prices) - 1e-2)
   }
   
@@ -63,6 +65,8 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
   result = CVXR::solve(problem)
 
   buy_assets = result[[1]]
+  
+  actual_budget = budget + 50
   
   new_positions = buy_assets + current_positions
   new_portfolio_weights = (new_positions) * buy_prices / sum((new_positions) * buy_prices)
@@ -73,7 +77,8 @@ reallocate_portfolio = function(suggested_weights, previous_result, allow_sellin
                   new_position = new_positions[,1],
                   new_portfolio_weights = new_position * buy_price / (sum(new_position * buy_price)),
                   transactions_costs = pmax(money_used[,1]*-1, 0) * (total_transaction_fee),
-                  money_leftover = budget - sum(money_used) - sum(transactions_costs))
+                  money_leftover = actual_budget - sum(money_used) - sum(transactions_costs),
+                  n_long = sum(dplyr::if_else(positions_bought > 0, 1, 0)))
   
   return(output)
 }
